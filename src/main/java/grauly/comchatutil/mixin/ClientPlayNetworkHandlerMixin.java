@@ -1,6 +1,6 @@
-package grauly.comchatutils.mixin;
+package grauly.comchatutil.mixin;
 
-import grauly.comchatutils.ComChatUtil;
+import grauly.comchatutil.ComChatUtil;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.network.packet.s2c.play.GameJoinS2CPacket;
 import org.spongepowered.asm.mixin.Mixin;

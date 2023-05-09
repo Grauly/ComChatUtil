@@ -11,7 +11,10 @@
   "environment": "client",
   "entrypoints": {
     "client": [
-      "grauly.comchatutils.ComChatUtil"
+      "grauly.comchatutil.ComChatUtil"
+    ],
+    "modmenu": [
+      "grauly.comchatutil.config.ModMenuIntegration"
     ]
   },
   "mixins": [
@@ -20,6 +23,7 @@
   "depends": {
     "fabricloader": ">=${loader_version}",
     "fabric": "*",
-    "minecraft": "${minecraft_version}"
+    "minecraft": "${minecraft_version}",
+    "cloth-config": ">=10.0.96"
   }
 }
