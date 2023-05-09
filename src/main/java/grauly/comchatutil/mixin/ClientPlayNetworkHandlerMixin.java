@@ -13,7 +13,7 @@ public class ClientPlayNetworkHandlerMixin {
 
     @Inject(at = @At("HEAD"), method = "sendChatCommand")
     public void sendChatCommand(String command, CallbackInfo ci) {
-        if(command.equals("cc") || command.equals("communitychat")) {
+        if(command.equalsIgnoreCase("cc") || command.equalsIgnoreCase("communitychat")) {
             ComChatUtil.inComChat = !ComChatUtil.inComChat;
         }
     }
