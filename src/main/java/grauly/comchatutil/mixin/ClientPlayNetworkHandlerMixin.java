@@ -16,8 +16,6 @@ public abstract class ClientPlayNetworkHandlerMixin {
 
     @Shadow public abstract void sendChatMessage(String content);
 
-    @Shadow public abstract boolean sendCommand(String command);
-
     @Inject(at = @At("HEAD"), method = "sendChatCommand")
     public void changeStateOnCommand(String command, CallbackInfo ci) {
         if(command.equalsIgnoreCase("cc") || command.equalsIgnoreCase("communitychat")) {
@@ -25,12 +23,23 @@ public abstract class ClientPlayNetworkHandlerMixin {
         }
     }
 
-    @Inject(at = @At("HEAD"), method = "sendChatMessage")
+    @Inject(at = @At("HEAD"), method = "sendChatMessage", cancellable = true)
     public void escapeGreetings(String content, CallbackInfo ci) {
         if(ComChatUtil.inComChat && content.matches("[wW][bB].?|[wW]elcome.?")) {
             sendChatCommand("cc");
+            try {
+                Thread.sleep(1000/20);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
             sendChatMessage(content);
-            sendCommand("cc");
+            try {
+                Thread.sleep(1000/20);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            sendChatCommand("cc");
+            ci.cancel();
         }
     }
 
