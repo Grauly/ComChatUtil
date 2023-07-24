@@ -1,16 +1,30 @@
 package grauly.comchatutil.event;
 
 import grauly.comchatutil.ComChatUtil;
+import grauly.comchatutil.config.ComChatConfig;
+import me.shedaniel.autoconfig.AutoConfig;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
+
+import java.util.ArrayList;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 public class ComChatEventListener {
 
     private static ClientPlayNetworkHandler networkHandler;
+    public static boolean regexUpdateNeeded = true;
+    private static String fullEscapingRegex;
 
     public static boolean handleComChatEscaping(String message) {
-        if (ComChatUtil.inComChat && message.matches("[wW][bB].?|[wW]elcome.?")) {
+        if (regexUpdateNeeded) {
+            createRegexFromUserConfig();
+            regexUpdateNeeded = false;
+        }
+        if (ComChatUtil.inComChat && message.matches(fullEscapingRegex)) {
             networkHandler.sendChatCommand("cc");
             try {
                 Thread.sleep(1000 / 20);
@@ -27,6 +41,37 @@ public class ComChatEventListener {
             return false;
         }
         return true;
+    }
+
+    public static void createRegexFromUserConfig() {
+        StringBuilder builder = new StringBuilder();
+        ArrayList<String> errorStrings = new ArrayList<>();
+        ComChatConfig config = AutoConfig.getConfigHolder(ComChatConfig.class).getConfig();
+        config.escapedPhrases.forEach(phrase -> {
+            try {
+                Pattern.compile(phrase);
+                builder.append(phrase);
+                builder.append("|");
+            } catch (PatternSyntaxException e) {
+                errorStrings.add(phrase);
+            }
+        });
+        builder.deleteCharAt(builder.length() - 1);
+        fullEscapingRegex = builder.toString();
+        createErrorMessage(errorStrings);
+    }
+
+    public static void createErrorMessage(ArrayList<String> errorStrings) {
+        if(errorStrings.size() == 0) {
+            return;
+        }
+        MutableText errorText = MutableText.of(Text.translatable("text.comchatutil.regex.error").getContent());
+        errorStrings.forEach(erroringString -> {
+            errorText.append(Text.literal("\n"));
+            errorText.append(Text.literal(erroringString));
+        });
+        System.out.println(errorText.toString());
+        MinecraftClient.getInstance().player.sendMessage(errorText);
     }
 
     public static void handleComChatToggle(String command) {
