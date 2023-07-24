@@ -9,5 +9,4 @@ import me.shedaniel.autoconfig.annotation.ConfigEntry;
 public class ComChatConfig implements ConfigData {
     @ConfigEntry.ColorPicker
     public int color = 42752;
-
 }
