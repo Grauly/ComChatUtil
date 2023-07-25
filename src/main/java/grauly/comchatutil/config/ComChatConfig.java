@@ -16,10 +16,4 @@ public class ComChatConfig implements ConfigData {
 
     @ConfigEntry.Gui.Tooltip
     public List<String> escapedPhrases = Arrays.asList("[wW][bB].?", "[wW]elcome.?");
-
-    @Override
-    public void validatePostLoad() throws ValidationException {
-        ConfigData.super.validatePostLoad();
-        ComChatEventListener.regexUpdateNeeded = true;
-    }
 }
