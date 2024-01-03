@@ -1,11 +1,11 @@
 # Com Chat Utils
-This is a Minecraft Mod to solve the confusion of (not) being in community chat, developed specifically for The OG SMP (http://theogsmp.com/). It colors the text in your chat field green (or whatever color you choose), whenever you are in community chat.
+This is a Minecraft Mod to solve the confusion of (not) being in group chat (formerly community chat), developed specifically for The OG SMP (http://theogsmp.com/), and Back2Basics (http://back2basics.gg/). It colors the text in your chat field green (or whatever color you choose), whenever you are in group chat.
 
 ## Reporting Bugs
 Found a bug? A crash log is mentioning this mod? Managed to desync the community chat state?
 Great! Kinda.
 
-Either raise an issue on this repo, or let me know on discord, you will find me on the OG SMP Discord.
+Either raise an issue on this repo, or let me know on discord, you will find me on the OG SMP/b2b Discord.
 
 When reporting a bug, try and reproduce it first, there is little I can do without that.
 
