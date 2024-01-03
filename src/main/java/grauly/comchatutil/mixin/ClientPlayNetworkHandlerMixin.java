@@ -1,13 +1,18 @@
 package grauly.comchatutil.mixin;
 
 import grauly.comchatutil.ComChatUtil;
+import grauly.comchatutil.config.ComChatConfig;
+import me.shedaniel.autoconfig.AutoConfig;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.network.packet.s2c.play.GameJoinS2CPacket;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Mixin(ClientPlayNetworkHandler.class)
 public abstract class ClientPlayNetworkHandlerMixin {
@@ -18,15 +23,31 @@ public abstract class ClientPlayNetworkHandlerMixin {
 
     @Inject(at = @At("HEAD"), method = "sendChatCommand")
     public void changeStateOnCommand(String command, CallbackInfo ci) {
-        if(command.equalsIgnoreCase("cc") || command.equalsIgnoreCase("communitychat")) {
+        var config = AutoConfig.getConfigHolder(ComChatConfig.class).getConfig();
+        var lowerCase = command.toLowerCase();
+        if(config.togglePhrases.contains(lowerCase)) {
             ComChatUtil.inComChat = !ComChatUtil.inComChat;
         }
     }
 
+    @ModifyVariable(method = "sendChatCommand", at = @At("HEAD"), ordinal = 0, argsOnly = true)
+    public String replaceAliases(String command) {
+        var config = AutoConfig.getConfigHolder(ComChatConfig.class).getConfig();
+        if(config.aliases.contains(command)) {
+            return config.togglePhrases.get(0);
+        }
+        return command;
+    }
+
     @Inject(at = @At("HEAD"), method = "sendChatMessage", cancellable = true)
     public void escapeGreetings(String content, CallbackInfo ci) {
-        if(ComChatUtil.inComChat && content.matches("[wW][bB].?|[wW]elcome.?")) {
-            sendChatCommand("cc");
+        var config = AutoConfig.getConfigHolder(ComChatConfig.class).getConfig();
+        AtomicBoolean shouldEscape = new AtomicBoolean(false);
+        config.escapedPhrases.forEach(p -> {
+            shouldEscape.set(shouldEscape.get() || content.matches(p));
+        });
+        if(ComChatUtil.inComChat && shouldEscape.get()) {
+            sendChatCommand(config.togglePhrases.get(0));
             try {
                 Thread.sleep(1000/20);
             } catch (InterruptedException e) {
@@ -38,7 +59,7 @@ public abstract class ClientPlayNetworkHandlerMixin {
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-            sendChatCommand("cc");
+            sendChatCommand(config.togglePhrases.get(0));
             ci.cancel();
         }
     }
