@@ -26,7 +26,7 @@ public class ComChatEventListener {
             createRegexFromUserConfig();
             needsRegexRecompile = false;
         }
-        if (ComChatUtil.inComChat && message.matches(fullEscapingRegex)) {
+        if (ComChatUtil.inComChat.get() && message.matches(fullEscapingRegex)) {
             networkHandler.sendChatCommand("cc");
             try {
                 Thread.sleep(1000 / 20);
@@ -79,12 +79,12 @@ public class ComChatEventListener {
     public static void handleComChatToggle(String command) {
         //no extra variants needed, as the server does not accept any other variants
         if (command.equalsIgnoreCase("cc") || command.equalsIgnoreCase("communitychat")) {
-            ComChatUtil.inComChat = !ComChatUtil.inComChat;
+            ComChatUtil.inComChat.set(!ComChatUtil.inComChat.get());
         }
     }
 
     public static void handleJoin(ClientPlayNetworkHandler clientPlayNetworkHandler, PacketSender sender, MinecraftClient minecraftClient) {
-        ComChatUtil.inComChat = false;
+        ComChatUtil.inComChat.set(false);
         networkHandler = clientPlayNetworkHandler;
     }
 

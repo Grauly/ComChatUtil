@@ -26,7 +26,7 @@ public abstract class ClientPlayNetworkHandlerMixin {
         var config = AutoConfig.getConfigHolder(ComChatConfig.class).getConfig();
         var lowerCase = command.toLowerCase();
         if(config.togglePhrases.contains(lowerCase)) {
-            ComChatUtil.inComChat = !ComChatUtil.inComChat;
+            ComChatUtil.inComChat.set(!ComChatUtil.inComChat.get());
         }
     }
 
@@ -46,7 +46,7 @@ public abstract class ClientPlayNetworkHandlerMixin {
         config.escapedPhrases.forEach(p -> {
             shouldEscape.set(shouldEscape.get() || content.matches(p));
         });
-        if(ComChatUtil.inComChat && shouldEscape.get()) {
+        if(ComChatUtil.inComChat.get() && shouldEscape.get()) {
             sendChatCommand(config.togglePhrases.get(0));
             try {
                 Thread.sleep(1000/20);
@@ -66,6 +66,6 @@ public abstract class ClientPlayNetworkHandlerMixin {
 
     @Inject(at = @At("HEAD"), method = "onGameJoin")
     public void onGameJoin(GameJoinS2CPacket packet, CallbackInfo ci) {
-        ComChatUtil.inComChat = false;
+        ComChatUtil.inComChat.set(false);
     }
 }
