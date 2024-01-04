@@ -21,13 +21,30 @@ public class ComChatEventListener {
     public static boolean needsRegexRecompile = true;
     private static String fullEscapingRegex;
 
+    public static String applyAliases(String command) {
+        var config = AutoConfig.getConfigHolder(ComChatConfig.class).getConfig();
+        if(config.aliases.contains(command)) {
+            return config.togglePhrases.get(0);
+        }
+        return command;
+    }
+
+    public static void handleComChatToggle(String command) {
+        var config = AutoConfig.getConfigHolder(ComChatConfig.class).getConfig();
+        var lowerCase = command.toLowerCase();
+        if(config.togglePhrases.contains(lowerCase)) {
+            ComChatUtil.inComChat.set(!ComChatUtil.inComChat.get());
+        }
+    }
+
     public static boolean handleComChatEscaping(String message) {
+        var config = AutoConfig.getConfigHolder(ComChatConfig.class).getConfig();
         if(needsRegexRecompile) {
             createRegexFromUserConfig();
             needsRegexRecompile = false;
         }
         if (ComChatUtil.inComChat.get() && message.matches(fullEscapingRegex)) {
-            networkHandler.sendChatCommand("cc");
+            networkHandler.sendChatCommand(config.togglePhrases.get(0));
             try {
                 Thread.sleep(1000 / 20);
             } catch (InterruptedException e) {
@@ -39,10 +56,15 @@ public class ComChatEventListener {
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-            networkHandler.sendChatCommand("cc");
+            networkHandler.sendChatCommand(config.togglePhrases.get(0));
             return false;
         }
         return true;
+    }
+
+    public static void handleJoin(ClientPlayNetworkHandler clientPlayNetworkHandler, PacketSender sender, MinecraftClient minecraftClient) {
+        ComChatUtil.inComChat.set(false);
+        networkHandler = clientPlayNetworkHandler;
     }
 
     public static void createRegexFromUserConfig() {
@@ -74,18 +96,6 @@ public class ComChatEventListener {
         });
         ComChatUtil.LOGGER.warn((errorText.toString()));
         MinecraftClient.getInstance().player.sendMessage(errorText);
-    }
-
-    public static void handleComChatToggle(String command) {
-        //no extra variants needed, as the server does not accept any other variants
-        if (command.equalsIgnoreCase("cc") || command.equalsIgnoreCase("communitychat")) {
-            ComChatUtil.inComChat.set(!ComChatUtil.inComChat.get());
-        }
-    }
-
-    public static void handleJoin(ClientPlayNetworkHandler clientPlayNetworkHandler, PacketSender sender, MinecraftClient minecraftClient) {
-        ComChatUtil.inComChat.set(false);
-        networkHandler = clientPlayNetworkHandler;
     }
 
     public static ActionResult onConfigChange(ConfigHolder<ComChatConfig> comChatConfigConfigHolder, ComChatConfig comChatConfig) {
