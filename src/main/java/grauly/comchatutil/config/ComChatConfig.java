@@ -20,5 +20,7 @@ public class ComChatConfig implements ConfigData {
     public List<String> escapedPhrases = List.of("[wW][bB].?", "[wW]elcome.?");
     @ConfigEntry.Gui.Tooltip
     public List<String> aliases = List.of("cc","gc","groupchat","communitychat");
+    @ConfigEntry.Gui.Tooltip
+    public int escapeDelayTicks = 1;
 
 }

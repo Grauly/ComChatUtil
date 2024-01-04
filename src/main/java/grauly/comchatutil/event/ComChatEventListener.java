@@ -46,13 +46,13 @@ public class ComChatEventListener {
         if (ComChatUtil.inComChat.get() && message.matches(fullEscapingRegex)) {
             networkHandler.sendChatCommand(config.togglePhrases.get(0));
             try {
-                Thread.sleep(1000 / 20);
+                Thread.sleep(50L * config.escapeDelayTicks);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
             networkHandler.sendChatMessage(message);
             try {
-                Thread.sleep(1000 / 20);
+                Thread.sleep(50L * config.escapeDelayTicks);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
