@@ -24,9 +24,14 @@ public class ComChatEventListener {
 
     public static String applyAliases(String command) {
         var config = AutoConfig.getConfigHolder(ComChatConfig.class).getConfig();
+        //toggle aliases
+        if(config.aliases.contains(command)) {
+            return config.getTogglePhrase();
+        }
+        //inline aliases
         for (String alias : config.aliases) {
             if(command.startsWith(alias)) {
-                return command.replaceFirst(alias,config.togglePhrases.get(0));
+                return command.replaceFirst(alias,config.getInlinePhrase());
             }
         }
         return command;
@@ -47,7 +52,7 @@ public class ComChatEventListener {
             needsRegexRecompile = false;
         }
         if (ComChatUtil.inComChat.get() && message.matches(fullEscapingRegex)) {
-            networkHandler.sendChatCommand(config.togglePhrases.get(0));
+            networkHandler.sendChatCommand(config.getInlinePhrase());
             try {
                 Thread.sleep(50L * config.escapeDelayTicks);
             } catch (InterruptedException e) {
@@ -59,7 +64,7 @@ public class ComChatEventListener {
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-            networkHandler.sendChatCommand(config.togglePhrases.get(0));
+            networkHandler.sendChatCommand(config.getInlinePhrase());
             return false;
         }
         return true;
@@ -89,7 +94,7 @@ public class ComChatEventListener {
     }
 
     public static void createErrorMessage(ArrayList<String> errorStrings) {
-        if(errorStrings.size() == 0) {
+        if(errorStrings.isEmpty()) {
             return;
         }
         MutableText errorText = MutableText.of(Text.translatable("text.comchatutil.regex.error").getContent());

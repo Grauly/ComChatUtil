@@ -4,6 +4,8 @@
   "text.autoconfig.comchatutil.option.escapedPhrases.@Tooltip": "Accepts Regex, will automatically add a | between entries",
   "text.autoconfig.comchatutil.option.togglePhrases": "Toggle Phrases",
   "text.autoconfig.comchatutil.option.togglePhrases.@Tooltip": "Exact text match, Case sensitive",
+  "text.autoconfig.comchatutil.option.inlinePhrases": "Inline Phrases",
+  "text.autoconfig.comchatutil.option.inlinePhrases.@Tooltip": "Commands after which text goes to group chat in any case",
   "text.autoconfig.comchatutil.option.aliases": "Command Aliases",
   "text.autoconfig.comchatutil.option.aliases.@Tooltip": "If you want to have shorter toggles, this is for you. Exact text match, Case sensitive, will replace this with the first of the toggle phrases",
   "text.autoconfig.comchatutil.option.escapeDelayTicks": "Escape Delay Ticks",
