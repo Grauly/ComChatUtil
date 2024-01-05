@@ -6,8 +6,7 @@
   "mixins": [
   ],
   "client": [
-    "ChatScreenMixin",
-    "ClientPlayNetworkHandlerMixin"
+    "ChatScreenMixin"
   ],
   "server": [],
   "injectors": {

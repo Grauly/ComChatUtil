@@ -17,7 +17,7 @@ public class ChatScreenMixin {
 
     @Inject(at = @At("TAIL"), method = "onChatFieldUpdate")
     private void onChatFieldUpdate(String chatText, CallbackInfo ci) {
-        if(ComChatUtil.inComChat) {
+        if(ComChatUtil.inComChat.get()) {
             ComChatConfig config = AutoConfig.getConfigHolder(ComChatConfig.class).getConfig();
             chatField.setEditableColor(config.color);
         } else {

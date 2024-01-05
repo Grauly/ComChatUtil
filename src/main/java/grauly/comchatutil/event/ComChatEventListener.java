@@ -12,6 +12,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -21,28 +22,57 @@ public class ComChatEventListener {
     public static boolean needsRegexRecompile = true;
     private static String fullEscapingRegex;
 
+    public static String applyAliases(String command) {
+        var config = AutoConfig.getConfigHolder(ComChatConfig.class).getConfig();
+        //toggle aliases
+        if(config.aliases.contains(command)) {
+            return config.getTogglePhrase();
+        }
+        //inline aliases
+        for (String alias : config.aliases) {
+            if(command.startsWith(alias)) {
+                return command.replaceFirst(alias,config.getInlinePhrase());
+            }
+        }
+        return command;
+    }
+
+    public static void handleComChatToggle(String command) {
+        var config = AutoConfig.getConfigHolder(ComChatConfig.class).getConfig();
+        var lowerCase = command.toLowerCase();
+        if(config.togglePhrases.contains(lowerCase)) {
+            ComChatUtil.inComChat.set(!ComChatUtil.inComChat.get());
+        }
+    }
+
     public static boolean handleComChatEscaping(String message) {
+        var config = AutoConfig.getConfigHolder(ComChatConfig.class).getConfig();
         if(needsRegexRecompile) {
             createRegexFromUserConfig();
             needsRegexRecompile = false;
         }
-        if (ComChatUtil.inComChat && message.matches(fullEscapingRegex)) {
-            networkHandler.sendChatCommand("cc");
+        if (ComChatUtil.inComChat.get() && message.matches(fullEscapingRegex)) {
+            networkHandler.sendChatCommand(config.getInlinePhrase());
             try {
-                Thread.sleep(1000 / 20);
+                Thread.sleep(50L * config.escapeDelayTicks);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
             networkHandler.sendChatMessage(message);
             try {
-                Thread.sleep(1000 / 20);
+                Thread.sleep(50L * config.escapeDelayTicks);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-            networkHandler.sendChatCommand("cc");
+            networkHandler.sendChatCommand(config.getInlinePhrase());
             return false;
         }
         return true;
+    }
+
+    public static void handleJoin(ClientPlayNetworkHandler clientPlayNetworkHandler, PacketSender sender, MinecraftClient minecraftClient) {
+        ComChatUtil.inComChat.set(false);
+        networkHandler = clientPlayNetworkHandler;
     }
 
     public static void createRegexFromUserConfig() {
@@ -64,7 +94,7 @@ public class ComChatEventListener {
     }
 
     public static void createErrorMessage(ArrayList<String> errorStrings) {
-        if(errorStrings.size() == 0) {
+        if(errorStrings.isEmpty()) {
             return;
         }
         MutableText errorText = MutableText.of(Text.translatable("text.comchatutil.regex.error").getContent());
@@ -74,18 +104,6 @@ public class ComChatEventListener {
         });
         ComChatUtil.LOGGER.warn((errorText.toString()));
         MinecraftClient.getInstance().player.sendMessage(errorText);
-    }
-
-    public static void handleComChatToggle(String command) {
-        //no extra variants needed, as the server does not accept any other variants
-        if (command.equalsIgnoreCase("cc") || command.equalsIgnoreCase("communitychat")) {
-            ComChatUtil.inComChat = !ComChatUtil.inComChat;
-        }
-    }
-
-    public static void handleJoin(ClientPlayNetworkHandler clientPlayNetworkHandler, PacketSender sender, MinecraftClient minecraftClient) {
-        ComChatUtil.inComChat = false;
-        networkHandler = clientPlayNetworkHandler;
     }
 
     public static ActionResult onConfigChange(ConfigHolder<ComChatConfig> comChatConfigConfigHolder, ComChatConfig comChatConfig) {
