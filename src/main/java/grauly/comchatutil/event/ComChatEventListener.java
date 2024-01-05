@@ -12,6 +12,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -23,8 +24,10 @@ public class ComChatEventListener {
 
     public static String applyAliases(String command) {
         var config = AutoConfig.getConfigHolder(ComChatConfig.class).getConfig();
-        if(config.aliases.contains(command)) {
-            return config.togglePhrases.get(0);
+        for (String alias : config.aliases) {
+            if(command.startsWith(alias)) {
+                return command.replaceFirst(alias,config.togglePhrases.get(0));
+            }
         }
         return command;
     }
