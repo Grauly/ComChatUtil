@@ -13,11 +13,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ChatScreen.class)
 public class ChatScreenMixin {
-    @Shadow protected TextFieldWidget chatField;
+    @Shadow
+    protected TextFieldWidget chatField;
 
     @Inject(at = @At("TAIL"), method = "onChatFieldUpdate")
     private void onChatFieldUpdate(String chatText, CallbackInfo ci) {
-        if(ComChatUtil.inComChat.get()) {
+        if (ComChatUtil.inComChat.get()) {
             ComChatConfig config = AutoConfig.getConfigHolder(ComChatConfig.class).getConfig();
             chatField.setEditableColor(config.color);
         } else {
