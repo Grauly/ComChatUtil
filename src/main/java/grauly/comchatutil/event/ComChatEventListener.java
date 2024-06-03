@@ -12,7 +12,6 @@ import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 
 import java.util.ArrayList;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 

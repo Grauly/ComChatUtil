@@ -1,14 +1,11 @@
 package grauly.comchatutil.config;
 
 import grauly.comchatutil.ComChatUtil;
-import grauly.comchatutil.event.ComChatEventListener;
 import me.shedaniel.autoconfig.ConfigData;
 import me.shedaniel.autoconfig.annotation.Config;
 import me.shedaniel.autoconfig.annotation.ConfigEntry;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 
 @Config(name = "comchatutil")
