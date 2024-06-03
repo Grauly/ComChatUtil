@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ComChatUtil implements ClientModInitializer {
 
-    public static AtomicBoolean inComChat = new AtomicBoolean(false);
+    public static final AtomicBoolean inComChat = new AtomicBoolean(false);
     public static final Logger LOGGER = LoggerFactory.getLogger("comchatutil");
 
     @Override
